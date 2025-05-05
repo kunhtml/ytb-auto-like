@@ -202,6 +202,193 @@ function clickSubscribeButton() {
   }, 30000);
 }
 
+// Function to create and manage speed control buttons
+function setupSpeedControls() {
+  // Check if speed controls already exist
+  if (document.getElementById("yt-auto-like-speed-controls")) {
+    return; // Speed controls already exist
+  }
+
+  console.log("Setting up speed control buttons...");
+
+  // Create the speed control container
+  const speedControlsContainer = document.createElement("div");
+  speedControlsContainer.id = "yt-auto-like-speed-controls";
+  speedControlsContainer.style.cssText = `
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 5px;
+    border-radius: 4px;
+  `;
+
+  // Define available speeds
+  const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+
+  // Create decrease speed button
+  const decreaseButton = document.createElement("button");
+  decreaseButton.textContent = "<";
+  decreaseButton.style.cssText = `
+    background-color: transparent;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 0;
+    transition: background-color 0.2s ease;
+  `;
+
+  // Create speed display
+  const speedDisplay = document.createElement("span");
+  speedDisplay.id = "yt-auto-like-speed-display";
+  speedDisplay.style.cssText = `
+    color: white;
+    font-size: 12px;
+    margin: 0 5px;
+    min-width: 40px;
+    text-align: center;
+  `;
+
+  // Create increase speed button
+  const increaseButton = document.createElement("button");
+  increaseButton.textContent = ">";
+  increaseButton.style.cssText = `
+    background-color: transparent;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 0;
+    transition: background-color 0.2s ease;
+  `;
+
+  // Function to update speed display
+  function updateSpeedDisplay(speed) {
+    speedDisplay.textContent = speed.toFixed(2) + "x";
+  }
+
+  // Decrease speed button click handler
+  decreaseButton.addEventListener("click", () => {
+    const video = document.querySelector("video");
+    if (video) {
+      const currentSpeed = video.playbackRate;
+      // Find the next lower speed
+      let newSpeed = speeds[0]; // Default to lowest if already at lowest
+
+      for (let i = speeds.length - 1; i >= 0; i--) {
+        if (speeds[i] < currentSpeed) {
+          newSpeed = speeds[i];
+          break;
+        }
+      }
+
+      video.playbackRate = newSpeed;
+      updateSpeedDisplay(newSpeed);
+    }
+  });
+
+  // Increase speed button click handler
+  increaseButton.addEventListener("click", () => {
+    const video = document.querySelector("video");
+    if (video) {
+      const currentSpeed = video.playbackRate;
+      // Find the next higher speed
+      let newSpeed = speeds[speeds.length - 1]; // Default to highest if already at highest
+
+      for (let i = 0; i < speeds.length; i++) {
+        if (speeds[i] > currentSpeed) {
+          newSpeed = speeds[i];
+          break;
+        }
+      }
+
+      video.playbackRate = newSpeed;
+      updateSpeedDisplay(newSpeed);
+    }
+  });
+
+  // Hover effects
+  decreaseButton.addEventListener("mouseover", () => {
+    decreaseButton.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
+  });
+
+  decreaseButton.addEventListener("mouseout", () => {
+    decreaseButton.style.backgroundColor = "transparent";
+  });
+
+  increaseButton.addEventListener("mouseover", () => {
+    increaseButton.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
+  });
+
+  increaseButton.addEventListener("mouseout", () => {
+    increaseButton.style.backgroundColor = "transparent";
+  });
+
+  // Add elements to container
+  speedControlsContainer.appendChild(decreaseButton);
+  speedControlsContainer.appendChild(speedDisplay);
+  speedControlsContainer.appendChild(increaseButton);
+
+  // Find the video player container
+  const findVideoPlayerContainer = setInterval(() => {
+    const videoPlayer = document.querySelector(
+      "#movie_player, .html5-video-player"
+    );
+    const video = document.querySelector("video");
+
+    if (videoPlayer && video) {
+      clearInterval(findVideoPlayerContainer);
+
+      // Add the speed controls to the video player
+      videoPlayer.appendChild(speedControlsContainer);
+
+      // Set initial speed display
+      updateSpeedDisplay(video.playbackRate);
+
+      // Show/hide controls on hover
+      videoPlayer.addEventListener("mouseenter", () => {
+        speedControlsContainer.style.opacity = "1";
+      });
+
+      videoPlayer.addEventListener("mouseleave", () => {
+        speedControlsContainer.style.opacity = "0";
+      });
+
+      console.log("Speed control buttons added successfully!");
+    }
+  }, 1000);
+
+  // Stop checking after 30 seconds to avoid infinite loops
+  setTimeout(() => {
+    clearInterval(findVideoPlayerContainer);
+    console.log("Stopped searching for video player after timeout");
+  }, 30000);
+}
+
+// Function to remove speed controls
+function removeSpeedControls() {
+  const speedControls = document.getElementById("yt-auto-like-speed-controls");
+  if (speedControls) {
+    speedControls.remove();
+    console.log("Speed control buttons removed");
+  }
+}
+
 // Main function to run when page loads
 function main() {
   console.log("YouTube Auto Like: Checking if we are on a video page...");
@@ -249,6 +436,17 @@ function main() {
       } else {
         console.log("YouTube Auto Like: Auto-subscribe is disabled");
       }
+
+      // Check if speed control is enabled
+      if (response && response.speedControlEnabled) {
+        console.log(
+          "YouTube Auto Like: Speed control is enabled, adding speed control buttons..."
+        );
+        setupSpeedControls();
+      } else {
+        console.log("YouTube Auto Like: Speed control is disabled");
+        removeSpeedControls();
+      }
     }, waitTimeMs);
   });
 }
@@ -271,6 +469,9 @@ const urlChangeObserver = new MutationObserver(() => {
     // Reset the subscription flag when navigating to a new page
     hasSubscribedToCurrentChannel = false;
 
+    // Remove existing speed controls before creating new ones
+    removeSpeedControls();
+
     // Wait a bit before running main to ensure the page has started loading
     setTimeout(main, 1000);
   }
@@ -284,6 +485,10 @@ document.addEventListener("yt-navigate-finish", () => {
   console.log("YouTube Auto Like: yt-navigate-finish event detected");
   // Reset the subscription flag when YouTube navigation event occurs
   hasSubscribedToCurrentChannel = false;
+
+  // Remove existing speed controls before creating new ones
+  removeSpeedControls();
+
   setTimeout(main, 1000);
 });
 
