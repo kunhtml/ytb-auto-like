@@ -2,14 +2,34 @@
 document.addEventListener("DOMContentLoaded", () => {
   const enabledCheckbox = document.getElementById("enabled");
   const subscribeEnabledCheckbox = document.getElementById("subscribeEnabled");
+  const speedControlEnabledCheckbox = document.getElementById(
+    "speedControlEnabled"
+  );
+  const universalSpeedControlEnabledCheckbox = document.getElementById(
+    "universalSpeedControlEnabled"
+  );
   const waitTimeInput = document.getElementById("waitTime");
 
   // Get current status from storage
   chrome.storage.sync.get(
-    ["enabled", "subscribeEnabled", "waitTime"],
+    [
+      "enabled",
+      "subscribeEnabled",
+      "waitTime",
+      "speedControlEnabled",
+      "universalSpeedControlEnabled",
+    ],
     (data) => {
       enabledCheckbox.checked = data.enabled;
       subscribeEnabledCheckbox.checked = data.subscribeEnabled;
+      speedControlEnabledCheckbox.checked =
+        data.speedControlEnabled !== undefined
+          ? data.speedControlEnabled
+          : true;
+      universalSpeedControlEnabledCheckbox.checked =
+        data.universalSpeedControlEnabled !== undefined
+          ? data.universalSpeedControlEnabled
+          : true;
       waitTimeInput.value = data.waitTime || 5; // Default to 5 seconds if not set
     }
   );
@@ -22,6 +42,19 @@ document.addEventListener("DOMContentLoaded", () => {
   subscribeEnabledCheckbox.addEventListener("change", () => {
     chrome.storage.sync.set({
       subscribeEnabled: subscribeEnabledCheckbox.checked,
+    });
+  });
+
+  speedControlEnabledCheckbox.addEventListener("change", () => {
+    chrome.storage.sync.set({
+      speedControlEnabled: speedControlEnabledCheckbox.checked,
+    });
+  });
+
+  universalSpeedControlEnabledCheckbox.addEventListener("change", () => {
+    chrome.storage.sync.set({
+      universalSpeedControlEnabled:
+        universalSpeedControlEnabledCheckbox.checked,
     });
   });
 
