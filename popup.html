@@ -1,34 +1,81 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>YouTube Auto Like</title>
-  <style>
-    body {
-      width: 200px;
-      padding: 10px;
-      font-family: Arial, sans-serif;
-    }
-    .title {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-    .toggle {
-      display: flex;
-      align-items: center;
-      margin-top: 10px;
-    }
-    .toggle-label {
-      margin-left: 10px;
-    }
-  </style>
-</head>
-<body>
-  <div class="title">YouTube Auto Like</div>
-  <div class="toggle">
-    <input type="checkbox" id="enabled" checked>
-    <label for="enabled" class="toggle-label">Auto-like videos</label>
-  </div>
-  <script src="popup.js"></script>
-</body>
+  <head>
+    <title>YouTube Auto Like</title>
+    <style>
+      body {
+        width: 250px;
+        padding: 10px;
+        font-family: Arial, sans-serif;
+      }
+      .title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .toggle {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+      }
+      .toggle-label {
+        margin-left: 10px;
+      }
+      .setting-group {
+        margin-top: 15px;
+        border-top: 1px solid #eee;
+        padding-top: 10px;
+      }
+      .setting-label {
+        font-size: 14px;
+        margin-bottom: 5px;
+        display: block;
+      }
+      .setting-input {
+        width: 60px;
+        padding: 5px;
+        margin-right: 5px;
+      }
+      .setting-row {
+        display: flex;
+        align-items: center;
+        margin-top: 5px;
+      }
+      .setting-unit {
+        color: #666;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="title">YouTube Auto Like</div>
+    <div class="toggle">
+      <input type="checkbox" id="enabled" checked />
+      <label for="enabled" class="toggle-label">Auto-like videos</label>
+    </div>
+    <div class="toggle">
+      <input type="checkbox" id="subscribeEnabled" checked />
+      <label for="subscribeEnabled" class="toggle-label"
+        >Auto-subscribe to channels</label
+      >
+    </div>
+
+    <div class="setting-group">
+      <label class="setting-label">Wait Time Settings</label>
+      <div class="setting-row">
+        <input
+          type="number"
+          id="waitTime"
+          class="setting-input"
+          min="1"
+          max="30"
+        />
+        <span class="setting-unit">seconds</span>
+      </div>
+      <div class="setting-row">
+        <small>Time to wait before clicking buttons (1-30 seconds)</small>
+      </div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
 </html>
