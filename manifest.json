@@ -12,6 +12,11 @@
     {
       "matches": ["*://*.youtube.com/*"],
       "js": ["content.js"]
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["video-speed-controls.js"],
+      "all_frames": true
     }
   ],
   "action": {
