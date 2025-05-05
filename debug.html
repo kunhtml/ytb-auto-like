@@ -1,115 +1,131 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>YouTube Auto Like - Debug</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      line-height: 1.5;
-    }
-    h1 {
-      color: #cc0000;
-    }
-    .instructions {
-      background-color: #f8f8f8;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-    }
-    .step {
-      margin-bottom: 10px;
-    }
-    code {
-      background-color: #eee;
-      padding: 2px 5px;
-      border-radius: 3px;
-      font-family: monospace;
-    }
-    .note {
-      color: #666;
-      font-style: italic;
-    }
-  </style>
-</head>
-<body>
-  <h1>YouTube Auto Like - Debug Page</h1>
-  
-  <div class="instructions">
-    <h2>How to Debug the Extension</h2>
-    
-    <div class="step">
-      <strong>Step 1:</strong> Open a YouTube video page (e.g., <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">this one</a>)
-    </div>
-    
-    <div class="step">
-      <strong>Step 2:</strong> Right-click on the page and select "Inspect" or press F12
-    </div>
-    
-    <div class="step">
-      <strong>Step 3:</strong> Go to the "Console" tab in the developer tools
-    </div>
-    
-    <div class="step">
-      <strong>Step 4:</strong> Look for messages from the extension (they start with "YouTube Auto Like:")
-    </div>
-    
-    <div class="step">
-      <strong>Step 5:</strong> If you see any errors, they will help identify what's wrong
-    </div>
-  </div>
-  
-  <h2>Common Issues and Solutions</h2>
-  
-  <h3>Like Button Not Found</h3>
-  <p>If you see "Still searching for like button..." messages repeatedly:</p>
-  <ul>
-    <li>YouTube might have updated their UI structure</li>
-    <li>Try running this code in the console to find the current selector:</li>
-    <code>
-      document.querySelectorAll('button').forEach(b => {
-        if (b.textContent.includes('Like') || 
-            (b.getAttribute('aria-label') && b.getAttribute('aria-label').includes('like'))) {
-          console.log('Potential like button:', b);
-          console.log('Selector path:', getElementPath(b));
-        }
-      });
-      
-      function getElementPath(el) {
-        if (!el) return '';
-        let path = '';
-        while (el.nodeType === Node.ELEMENT_NODE) {
-          let selector = el.nodeName.toLowerCase();
-          if (el.id) {
-            selector += '#' + el.id;
-            path = ' > ' + selector + path;
-            break;
-          } else {
-            let sibling = el;
-            let nth = 1;
-            while (sibling = sibling.previousElementSibling) {
-              if (sibling.nodeName.toLowerCase() === selector) nth++;
-            }
-            if (nth !== 1) selector += ":nth-of-type("+nth+")";
-          }
-          path = ' > ' + selector + path;
-          el = el.parentNode;
-        }
-        return path.substring(3);
+  <head>
+    <title>YouTube Auto Like - Debug</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.5;
       }
-    </code>
-  </ul>
-  
-  <h3>Extension Not Running</h3>
-  <p>If you don't see any messages from the extension:</p>
-  <ul>
-    <li>Make sure the extension is enabled in Chrome's extension manager</li>
-    <li>Try reloading the extension by going to chrome://extensions, finding the extension, and clicking the refresh icon</li>
-    <li>Check if there are any errors in the "Errors" section of the extension's details in chrome://extensions</li>
-  </ul>
-  
-  <div class="note">
-    <p>Note: YouTube's UI can change frequently, which might require updates to the selectors used in the extension.</p>
-  </div>
-</body>
+      h1 {
+        color: #cc0000;
+      }
+      .instructions {
+        background-color: #f8f8f8;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+      .step {
+        margin-bottom: 10px;
+      }
+      code {
+        background-color: #eee;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-family: monospace;
+      }
+      .note {
+        color: #666;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>YouTube Auto Like - Debug Page</h1>
+
+    <div class="instructions">
+      <h2>How to Debug the Extension</h2>
+
+      <div class="step">
+        <strong>Step 1:</strong> Open a YouTube video page (e.g.,
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank"
+          >this one</a
+        >)
+      </div>
+
+      <div class="step">
+        <strong>Step 2:</strong> Right-click on the page and select "Inspect" or
+        press F12
+      </div>
+
+      <div class="step">
+        <strong>Step 3:</strong> Go to the "Console" tab in the developer tools
+      </div>
+
+      <div class="step">
+        <strong>Step 4:</strong> Look for messages from the extension (they
+        start with "YouTube Auto Like:")
+      </div>
+
+      <div class="step">
+        <strong>Step 5:</strong> If you see any errors, they will help identify
+        what's wrong
+      </div>
+    </div>
+
+    <h2>Common Issues and Solutions</h2>
+
+    <h3>Like Button or Subscribe Button Not Found</h3>
+    <p>
+      If you see "Still searching for like button..." or "Still searching for
+      subscribe button..." messages repeatedly:
+    </p>
+    <ul>
+      <li>YouTube might have updated their UI structure</li>
+      <li>
+        Try running this code in the console to find the current selector for
+        the like button:
+      </li>
+      <code>
+        document.querySelectorAll('button').forEach(b => { if
+        (b.textContent.includes('Like') || (b.getAttribute('aria-label') &&
+        b.getAttribute('aria-label').includes('like'))) { console.log('Potential
+        like button:', b); console.log('Selector path:', getElementPath(b)); }
+        }); function getElementPath(el) { if (!el) return ''; let path = '';
+        while (el.nodeType === Node.ELEMENT_NODE) { let selector =
+        el.nodeName.toLowerCase(); if (el.id) { selector += '#' + el.id; path =
+        ' > ' + selector + path; break; } else { let sibling = el; let nth = 1;
+        while (sibling = sibling.previousElementSibling) { if
+        (sibling.nodeName.toLowerCase() === selector) nth++; } if (nth !== 1)
+        selector += ":nth-of-type("+nth+")"; } path = ' > ' + selector + path;
+        el = el.parentNode; } return path.substring(3); }
+      </code>
+    </ul>
+
+    <ul>
+      <li>
+        Or try this code to find the current selector for the subscribe button:
+      </li>
+      <code>
+        document.querySelectorAll('button').forEach(b => { if
+        (b.textContent.includes('Subscribe') || (b.getAttribute('aria-label') &&
+        b.getAttribute('aria-label').includes('subscribe'))) {
+        console.log('Potential subscribe button:', b); console.log('Selector
+        path:', getElementPath(b)); } });
+      </code>
+    </ul>
+
+    <h3>Extension Not Running</h3>
+    <p>If you don't see any messages from the extension:</p>
+    <ul>
+      <li>Make sure the extension is enabled in Chrome's extension manager</li>
+      <li>
+        Try reloading the extension by going to chrome://extensions, finding the
+        extension, and clicking the refresh icon
+      </li>
+      <li>
+        Check if there are any errors in the "Errors" section of the extension's
+        details in chrome://extensions
+      </li>
+    </ul>
+
+    <div class="note">
+      <p>
+        Note: YouTube's UI can change frequently, which might require updates to
+        the selectors used in the extension.
+      </p>
+    </div>
+  </body>
 </html>
